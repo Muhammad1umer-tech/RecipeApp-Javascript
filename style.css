@@ -95,3 +95,15 @@ header button {
   display: flex;
   justify-content: space-between
 }
+
+.fav-meals li .clear {
+  background-color: transparent;
+  position: relative;
+  top: -50px;
+  font-size: 10px;
+  opacity: 0;
+}
+/* hover work in only elements */
+.fav-meals li:hover .clear{
+  opacity: 1
+}

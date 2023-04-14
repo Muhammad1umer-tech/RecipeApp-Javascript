@@ -1,4 +1,14 @@
 getRandonMeal();
+fetchMeals();
+
+const searchterm = document.getElementById("search-term");
+const search = document.getElementById("search");
+  search.addEventListener("click", () => {
+    const mealName = searchterm.value;
+    getmealbySearch(mealName);
+  });
+
+
 async function getRandonMeal() {
   console.log("randomMeal");
   const randomMeal = await fetch('https://www.themealdb.com/api/json/v1/1/random.php');
@@ -14,10 +24,12 @@ async function getMealById(id) {
   return mm.meals[0];
 }
 
-// async function getmealbySearch(name) {
-//   const randomMeal = await fetch('www.themealdb.com/api/json/v1/1/search.php?s=' + name);
-
-// }
+async function getmealbySearch(name) {
+  
+  const randomMeal = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + name);
+  const responsdata = await randomMeal.json();
+  loadRandomMeal(responsdata.meals[0], true)
+}
 
 function loadRandomMeal(meals, random) {
   const mealele = document.querySelector('.meal');
@@ -38,10 +50,14 @@ function loadRandomMeal(meals, random) {
   const heartbtn = document.getElementById('heart');
   heartbtn.addEventListener('click', () => {
     addmealLs(meals.idMeal);
-    fetchMeals();
+    fetchMealsLastone();
   });
 }
-
+function remvoemeal(id) {
+  const meal = getMealLocalStorage();
+  const removeone = meal.filter((val) => id !== val);
+  localStorage.setItem("mealids", JSON.stringify(removeone));
+}
 function addmealLs(id) {
   const mealids = getMealLocalStorage();
   localStorage.setItem("mealids", JSON.stringify([...mealids, id]));
@@ -54,21 +70,37 @@ function getMealLocalStorage() {
 }
 
 async function fetchMeals() {
+  const favmeals = document.querySelector(".fav-meals");
+  const cl = favmeals.querySelector(".cl");
+  console.log(cl);
+  favmeals.innerHTML = "";
   const mealids = getMealLocalStorage();
-  mealarr= [];
-  for(let i=0 ; i<mealids.length ; i++) {
+  mealarr = [];
+  for (let i = 0; i < mealids.length; i++) {
     const meal = await getMealById(mealids[i]);
     addMealtoFav(meal);
     // mealarr.push(meal);
-    
   }
   // console.log(mealarr);
 }
+async function fetchMealsLastone() {
+  const mealids = getMealLocalStorage();
+  mealarr = [];
+  const meal = await getMealById(mealids[mealids.length - 1]);
+  addMealtoFav(meal);
+}
+
+const favmeals = document.querySelector('.fav-meals');
 function addMealtoFav(meal) {
   const elee = document.createElement('li');
-  const favmeals = document.querySelector('.fav-meals');
-  elee.innerHTML = `<img src="${meal.strMealThumb}" alt=""><Span></Span>`;
+  elee.innerHTML = `<img src="${meal.strMealThumb}" alt=""><button class="clear">X</button>`;
+  elee.classList.add("cl")
+  //if html in js and want to access . use that elemnt jis mai tum innerhtml kr rh......
   favmeals.append(elee);
-  const heartbtn = document.getElementById('heart');
- 
+  const clear = elee.querySelector(".clear");
+  clear.addEventListener("click", () => {
+    remvoemeal(meal.idMeal);
+    fetchMeals();
+  });
 }
+
