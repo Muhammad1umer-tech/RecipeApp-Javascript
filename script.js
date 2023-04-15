@@ -3,10 +3,10 @@ fetchMeals();
 
 const searchterm = document.getElementById("search-term");
 const search = document.getElementById("search");
-  search.addEventListener("click", () => {
-    const mealName = searchterm.value;
-    getmealbySearch(mealName);
-  });
+search.addEventListener("click", () => {
+  const mealName = searchterm.value;
+  getmealbySearch(mealName);
+});
 
 
 async function getRandonMeal() {
@@ -25,7 +25,7 @@ async function getMealById(id) {
 }
 
 async function getmealbySearch(name) {
-  
+
   const randomMeal = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=' + name);
   const responsdata = await randomMeal.json();
   loadRandomMeal(responsdata.meals[0], true)
@@ -37,7 +37,7 @@ function loadRandomMeal(meals, random) {
   ele.innerHTML = `
         <div class="meal-header">
         ${random ? `<span class="random">${meals.strMeal}</span>` : 'hehe'}
-          <img src="${meals.strMealThumb}">
+          <img id="imgclick" src="${meals.strMealThumb}">
         </div>
         <div class="meal-body">
           <h4>${meals.strMeal}</h4>
@@ -52,6 +52,14 @@ function loadRandomMeal(meals, random) {
     addmealLs(meals.idMeal);
     fetchMealsLastone();
   });
+
+  // we cant use mealele.getelementById
+   const imgclick = mealele.querySelector("#imgclick");
+  
+ imgclick.addEventListener("click", () =>{
+       showemealinfo(meals);
+      });
+
 }
 function remvoemeal(id) {
   const meal = getMealLocalStorage();
@@ -97,10 +105,39 @@ function addMealtoFav(meal) {
   elee.classList.add("cl")
   //if html in js and want to access . use that elemnt jis mai tum innerhtml kr rh......
   favmeals.append(elee);
+  
   const clear = elee.querySelector(".clear");
   clear.addEventListener("click", () => {
     remvoemeal(meal.idMeal);
     fetchMeals();
   });
+
+  elee.addEventListener("click", () =>{
+       showemealinfo(meal);
+      });
+  
 }
+
+
+const mealinfo = document.getElementById("mealinfo");
+function showemealinfo(meal) {
+  const mealele = document.createElement("div");
+  mealinfo.innerHTML = "";
+  mealele.innerHTML = `<h1>${meal.strMeal}</h1>
+   <button class="popupButton">X</button>
+      <img src="${meal.strMealThumb}">
+      <p>${meal.strInstructions}</p>`
+      mealinfo.append(mealele);
+  
+      const mealpopup = document.getElementById("meal-popup");
+      const popbtn = mealinfo.querySelector(".popupButton");
+      
+
+      mealpopup.classList.remove("hidden");
+      popbtn.addEventListener("click", () => {
+        mealpopup.classList.add("hidden");
+      });
+
+}
+
 
